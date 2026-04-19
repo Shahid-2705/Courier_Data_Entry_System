@@ -1,67 +1,114 @@
 {% extends "layout.html" %}
 
+{% block title %}Zone Entry{% endblock %}
+
 {% block content %}
-
-<h4 class="mb-3">Zone Entry</h4>
-
-<!-- Export Button -->
-<div class="d-flex justify-content-end mb-2">
-    <a href="/zone-export" class="btn btn-success">
-        <i class="fa fa-file-excel"></i> Export to Excel
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4 animate-fade-in-up">
+    <div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Zone Directory</h2>
+        <p class="text-sm text-gray-400 mt-1">Manage delivery districts and routing zones.</p>
+    </div>
+    <a href="/zone-export" class="flex items-center text-sm px-4 py-2 bg-green-600/20 text-green-400 border border-green-500/30 rounded-lg hover:bg-green-600/30 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.1)] shrink-0 group">
+        <i class="fa-solid fa-file-excel mr-2 group-hover:scale-110 transition-transform"></i> Export Data
     </a>
 </div>
 
-<!-- Entry Form -->
-<div class="card p-3 mb-4">
-    <form method="post">
-        <div class="row">
-            <div class="col-md-5">
-                <label class="form-label">District</label>
-                <input type="text" name="district" class="form-control" placeholder="Enter District" required>
-            </div>
+<div class="grid lg:grid-cols-3 gap-8">
+    <!-- Form Sidebar -->
+    <div class="lg:col-span-1 animate-fade-in-up">
+        <div class="glass-card p-6 sticky top-24">
+            <h3 class="text-lg font-medium text-white mb-5 border-b border-white/5 pb-3 flex items-center">
+                <i class="fa-solid fa-map-location-dot text-primary mr-2"></i> Add New Zone
+            </h3>
+            <form method="post" class="space-y-5">
+                <div>
+                    <label class="form-label">DISTRICT</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-building absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                        <input name="district" class="input-glass pl-9" required autocomplete="off" autofocus placeholder="e.g. Ernakulam">
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">RATE ZONE</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-route absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                        <input name="rate_zone" class="input-glass pl-9" required autocomplete="off" placeholder="e.g. Zone A">
+                    </div>
+                </div>
+                <div class="pt-3">
+                    <button type="submit" class="btn-primary-gradient w-full py-2.5 rounded-lg text-sm font-medium flex items-center justify-center group shadow-glow">
+                        <i class="fa-solid fa-plus mr-2 group-hover:rotate-90 transition-transform duration-300"></i> Add Zone
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <div class="col-md-5">
-                <label class="form-label">Rate Zone</label>
-                <input type="text" name="rate_zone" class="form-control" placeholder="Enter Rate Zone" required>
-            </div>
-
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-success w-100">
-                    <i class="fa fa-save"></i> Save
-                </button>
+    <!-- Table Content -->
+    <div class="lg:col-span-2 animate-fade-in-up" style="animation-delay: 100ms;">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 px-1 gap-3">
+            <h3 class="text-lg font-medium text-white flex items-center">
+                <i class="fa-solid fa-list-ul mr-2 text-primary/70 text-sm"></i> Zone Directory
+            </h3>
+            <div class="relative w-full sm:w-64">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"></i>
+                <input type="text" id="tableSearch" placeholder="Search districts..." class="w-full bg-dark-800/80 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors focus:ring-1 focus:ring-primary/50">
             </div>
         </div>
-    </form>
+
+        <div class="glass-table-container shadow-xl">
+            <div class="max-h-[600px] overflow-y-auto custom-scrollbar">
+                <table class="w-full text-sm text-left table-auto" id="dataTable">
+                    <thead class="text-xs text-gray-400 uppercase tracking-wider border-b border-white/10 bg-dark-800/90 backdrop-blur-md sticky top-0 z-10">
+                        <tr>
+                            <th class="px-6 py-4 font-medium w-16">#</th>
+                            <th class="px-6 py-4 font-medium">District</th>
+                            <th class="px-6 py-4 font-medium w-40">Rate Zone</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 text-gray-300">
+                        {% for z in zones %}
+                        <tr class="hover:bg-white/5 transition-colors group">
+                            <td class="px-6 py-4 text-gray-500 w-16">{{ loop.index }}</td>
+                            <td class="px-6 py-4 font-medium text-white">{{ z.district }}</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.05)]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 mr-2 shadow-[0_0_5px_rgba(99,102,241,0.8)]"></span>
+                                    {{ z.rate_zone }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="px-6 py-20 text-center">
+                                <div class="flex flex-col items-center justify-center text-gray-500">
+                                    <div class="w-16 h-16 rounded-full bg-dark-800 flex items-center justify-center mb-4 border border-white/5 shadow-inner">
+                                        <i class="fa-solid fa-map text-2xl opacity-50"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-400">No zones active</p>
+                                    <p class="text-xs mt-1">Add your first district and zone mapping.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Data Table -->
-<div class="card p-3">
-    <h6 class="mb-3">Zone List</h6>
-
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th width="10%">ID</th>
-                <th width="45%">District</th>
-                <th width="45%">Rate Zone</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for z in zones %}
-            <tr>
-                <td>{{ z.id }}</td>
-                <td>{{ z.district }}</td>
-                <td>{{ z.rate_zone }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="3" class="text-center text-muted">
-                    No Records Found
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
+<script>
+    document.getElementById('tableSearch')?.addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let rows = document.querySelector("#dataTable tbody").rows;
+        
+        for (let i = 0; i < rows.length; i++) {
+            let row = rows[i];
+            if(row.cells.length === 1) continue;
+            let text = row.textContent || row.innerText;
+            row.style.display = text.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        }
+    });
+</script>
 {% endblock %}
